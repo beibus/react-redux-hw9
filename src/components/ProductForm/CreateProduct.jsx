@@ -1,11 +1,25 @@
-import React from "react";
-import { Button, Form, Input } from "antd";
+import React, { useState } from "react";
+import { Button, Form, Input, Modal, Space } from "antd";
 import { createProduct } from '../../store/actions';
 import { useDispatch } from 'react-redux';
 
+
 export const CreateProduct = () => {
+  const [open, setOpen] = useState(false);
+  const [form] = Form.useForm();
+
+  const showModal = () => {
+    form.resetFields();
+    setOpen(true);
+  };
+
+  const hideModal = () => {
+    setOpen(false);
+    
+  };
+
   const dispatch = useDispatch();
-  
+
   const onFinish = (values) => {
     console.log("Success:", values);
     dispatch(createProduct(values))
@@ -18,44 +32,58 @@ export const CreateProduct = () => {
   return (
     <div>
       <h1>Create Product</h1>
-      <Form
-        name="basic"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        autoComplete="off"
+      <Button type="primary" onClick={showModal}>
+        Add product
+      </Button>
+      <Modal
+        title="Modal"
+        open={open}
+        onOk={hideModal}
+        onCancel={hideModal}
+        footer={null}
+        okText="Confirm"
+        cancelText="Cancel"
       >
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[
-            {
-              required: true,
-              message: "Please input Product Name!",
-            },
-          ]}
+        <Form
+          form={form}
+          name="basic"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          autoComplete="off"
         >
-          <Input />
-        </Form.Item>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              {
+                required: true,
+                message: "Please input Product Name!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item
-          label="Price"
-          name="price"
-          rules={[
-            {
-              required: true,
-              message: "Please input Product Price!",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
+          <Form.Item
+            label="Price"
+            name="price"
+            rules={[
+              {
+                required: true,
+                message: "Please input Product Price!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Save
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" onClick={hideModal}>
+              Save
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

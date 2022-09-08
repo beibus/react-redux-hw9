@@ -1,11 +1,13 @@
 import { 
   FETCH_PRODUCTS, 
-  RECEIVE_PRODUCTS 
+  RECEIVE_PRODUCTS, 
+  HIDE_MODAL 
 } from './actions';
 
 const initialState = {
   products: [],
-  productsLoading: false
+  productsLoading: false,
+  setOpen: false
 }
 
 export default function reducer(state = initialState, action) {
@@ -22,7 +24,11 @@ export default function reducer(state = initialState, action) {
         productsLoading: false,
         products: action.payload
       }
-    
+    case HIDE_MODAL:
+      return {
+        ...state,
+        setOpen: false
+      }
     default:
       return state;
   }
