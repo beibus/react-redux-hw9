@@ -1,28 +1,53 @@
-import React, { useState } from "react";
-import { Button, Form, Input, Modal, Space } from "antd";
-import { createProduct } from '../../store/actions';
-import { useDispatch } from 'react-redux';
+import React, { useState, useEffect } from "react";
+import { Button, Form, Input, Modal, Upload } from "antd";
+import { PlusOutlined } from '@ant-design/icons';
+import { addProduct, createProduct, setModalState, setEditProduct, editProducts } from '../../store/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { v4 as uuid } from "uuid";
 
 
 export const CreateProduct = () => {
+  const dispatch = useDispatch();
+  const isModalOpen = useSelector((store) => store.isModalOpen)
   const [open, setOpen] = useState(false);
+  const editProduct = useSelector((store) => store.editProduct)
   const [form] = Form.useForm();
 
+  useEffect(() => {
+    if (!editProduct) return
+    form.setFieldsValue(editProduct)
+
+  }, [form, editProduct])
+
   const showModal = () => {
-    form.resetFields();
-    setOpen(true);
+    dispatch(setModalState(true))
   };
 
-  const hideModal = () => {
-    setOpen(false);
-    
-  };
+  const closeModal = () => {
+    dispatch(setModalState(false));
+    dispatch(setEditProduct(null))
+    form.resetFields()
+  }
 
-  const dispatch = useDispatch();
 
-  const onFinish = (values) => {
+  const onFinish = (values, ) => {
     console.log("Success:", values);
-    dispatch(createProduct(values))
+    if (editProduct) {
+      
+
+      dispatch(editProducts(values))
+    }
+    else{
+      let payload = {
+        id: uuid(),
+        name: values.name,
+        description: values.description,
+        phone: values.phone,
+      }
+      dispatch(addProduct(payload))
+      console.log(payload);
+    }
+    dispatch(setModalState(false))
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -37,9 +62,8 @@ export const CreateProduct = () => {
       </Button>
       <Modal
         title="Modal"
-        open={open}
-        onOk={hideModal}
-        onCancel={hideModal}
+        open={isModalOpen}
+        onCancel={closeModal}
         footer={null}
         okText="Confirm"
         cancelText="Cancel"
@@ -57,7 +81,7 @@ export const CreateProduct = () => {
             rules={[
               {
                 required: true,
-                message: "Please input Product Name!",
+                message: "Please input name!",
               },
             ]}
           >
@@ -65,20 +89,48 @@ export const CreateProduct = () => {
           </Form.Item>
 
           <Form.Item
-            label="Price"
-            name="price"
+            label="Description"
+            name="description"
             rules={[
               {
                 required: true,
-                message: "Please input Product Price!",
+                message: "Please input description!",
               },
             ]}
           >
             <Input />
           </Form.Item>
 
+          <Form.Item
+            label="Phone"
+            name="phone"
+            rules={[
+              {
+                required: true,
+                message: "Please input phone number!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item label="Upload" valuePropName="fileList">
+          <Upload listType="picture-card">
+            <div>
+              <PlusOutlined />
+              <div
+                style={{
+                  marginTop: 8,
+                }}
+              >
+                Upload
+              </div>
+            </div>
+          </Upload>
+        </Form.Item>
+
           <Form.Item>
-            <Button type="primary" htmlType="submit" onClick={hideModal}>
+            <Button type="primary" htmlType="submit">
               Save
             </Button>
           </Form.Item>

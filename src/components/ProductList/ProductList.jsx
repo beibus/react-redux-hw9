@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Avatar, List } from 'antd';
-import { fetchProducts } from './../../store/actions'
+import { Avatar, List, Card } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { CreateProduct } from '../ProductForm/CreateProduct';
+import { removeProduct, setModalState, setEditProduct } from '../../store/actions';
 
 export const ProductList = () => {
   const dispatch = useDispatch();
@@ -10,9 +11,21 @@ export const ProductList = () => {
   const productsLoading = useSelector((store) => store.productsLoading)
   
 
-  useEffect(() => {
-    dispatch(fetchProducts())
-  }, [])
+  const showModal = () => {
+    dispatch(setModalState(true))
+  }
+
+  const handleRemove = (productId) => {
+    console.log(productId);
+    dispatch(removeProduct(productId))
+  }
+
+  const handleEdit = (values) => {
+    dispatch(setEditProduct(values))
+    console.log('values', values);
+    showModal()
+
+  }
 
   console.log('products', products)
 
@@ -33,9 +46,14 @@ export const ProductList = () => {
               title={item.name}
               description={<div>{item.price}</div>}
             />
+            <DeleteOutlined
+                onClick={() => { handleRemove(item.id) }}
+              />
+              <EditOutlined onClick={() => handleEdit(item.id)} />
           </List.Item>
         )}
       />
+      
     </div>
   )
 }
